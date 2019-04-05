@@ -1,0 +1,90 @@
+id: alpha_pages
+migration_group: example_customD8_alpha
+migration_tags:
+  - CustomD8 Alpha
+label: 'Import XML content from Alpha data structure files'
+
+source:
+  plugin: csv
+  path: ./modules/custom/example_customD8_migrate_alpha/data/example_customD8_migrate_alpha.csv
+  header_row_count: 1
+  keys:
+    - filepath
+  column_names:
+    0:
+      url: 'URL Path'
+    1:
+      filepath: 'File Path'
+    2:
+      dcrpath: 'Local Path to XML'
+    3:
+      last-modified: 'Modified Date'
+    5:
+      keep?: 'Migrate Yes or No'
+  ids:
+    filepath:
+      type: string
+  constants:
+    domain: 'www_alpha_org'
+
+process:
+  filter1:
+    plugin: check_for_web
+    source: filepath
+  filter2:
+    plugin: alpha_check_migrate
+    source: keep?
+  type:
+    plugin: default_value
+    default_value: dynamic_page
+  title:
+    plugin: alpha_parse_title
+    source: dcrpath
+    module: example_customD8_migrate_alpha
+  body/value:
+    -
+      plugin: alpha_parse_body
+      source: dcrpath
+      module: example_customD8_migrate_alpha
+    -
+      plugin: entity_embed
+      remote_domain: 'http://www.alpha.com'
+  body/format:
+    plugin: default_value
+    default_value: "full_html"
+  field_metatag_description:
+    plugin: parse_xml
+    source: dcrpath
+    module: example_customD8_migrate_alpha
+  field_member_protected:
+    plugin: alpha_protected
+    source: filepath
+  field_domain_access: constants/domain
+  created:
+    plugin: callback
+    source: last-modified
+    callable: strtotime
+  changed:
+    # Making this the current timestamp.
+    plugin: callback
+    callable: strtotime
+  uid:
+    plugin: default_value
+    default_value: 1
+  sticky:
+    plugin: default_value
+    default_value: 0
+  path/pathauto:
+    plugin: default_value
+    default_value: 0 # Disable pathauto.
+  path/alias:
+    plugin: remove_extension
+    source: filepath
+  status:
+    plugin: default_value
+    default_value: 0
+destination:
+  plugin: entity:node
+dependencies:
+  module:
+    - example_customD8_migrate

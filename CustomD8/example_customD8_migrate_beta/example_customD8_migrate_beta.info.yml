@@ -1,0 +1,11 @@
+name: Example CustomD8 Migrate Beta XML to D8
+type: module
+core: 8.x
+package: Example
+description: 'XML to Drupal 8 Custom Migration Module - Beta'
+dependencies:
+  - drupal:migrate
+  - drupal:example_customD8_migrate
+  - migrate_plus:migrate_plus
+  - migrate_tools:migrate_tools
+  - migrate_source_csv:migrate_source_csv

@@ -1,0 +1,32 @@
+id: wp_media_user
+label: Media - User Generated
+migration_tags:
+  - Wordpress
+migration_group: wordpress
+source:
+  plugin: user_images
+  key: wordpress
+destination:
+  plugin: entity:media
+process:
+  bundle:
+    plugin: default_value
+    default_value: image
+  name: post_title
+  field_media_image/target_id:
+    plugin: migration_lookup
+    migration:
+      - wp_files_user
+    source: filename
+  field_media_image/alt: alt
+  field_media_caption/value: caption
+  field_media_caption/format:
+    plugin: default_value
+    default_value: filtered_html
+  uid:
+    plugin: default_value
+    default_value: 1
+migration_dependencies:
+  required:
+    - wp_files_user
+  optional: {  }

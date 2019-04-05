@@ -1,0 +1,157 @@
+# This migration demonstrates importing from multiple XML files.
+id: gamma_articles
+label: 'Import XML content from Gamma XML files'
+migration_group: example_customD8_gamma
+migration_tags:
+  - Example CustomD8 Gamma
+
+source:
+  # We use the XML source plugin.
+  plugin: gamma_url
+  data_fetcher_plugin: file
+  data_parser_plugin: xml
+  # Normally, this is one or more fully-qualified URLs or file paths. Because
+  # we can't hardcode your local URL, we provide a relative path here which
+  # hook_install() will rewrite to a full URL for the current site.
+  urls:
+    - public://gamma/data/export_1.xml
+    - public://gamma/data/export_2.xml
+    - public://gamma/data/export_3.xml
+  # Visit the URL above (relative to your site root) and look at it. You can see
+  # that <response> is the outer element, and each item we want to import is a
+  # <position> element. The item_xpath value is the xpath to use to query the
+  # desired elements.
+  item_selector: /rev5:document/rev5:article
+  # Under 'fields', we list the data items to be imported. The first level keys
+  # are the source field names we want to populate (the names to be used as
+  # sources in the process configuration below). For each field we're importing,
+  # we provide a label (optional - this is for display in migration tools) and
+  # an xpath for retrieving that value. It's important to note that this xpath
+  # is relative to the elements retrieved by item_xpath.
+  fields:
+    -
+      name: id
+      label: ID
+      selector: 'rev5:db-id'
+    -
+      name: author
+      label: author
+      selector: 'rev5:byline'
+    -
+      name: title
+      label: Title
+      selector: 'rev5:headline'
+    -
+      name: subtitle
+      label: Subtitle
+      selector: 'rev5:sub-headline'
+    -
+      name: summary
+      label: 'Summary/Teaser'
+      selector: 'rev5:teaser'
+    -
+      name: body
+      label: Body
+      selector: 'rev5:body-section-list/rev5:body-section/rev5:body'
+    -
+      name: alias
+      label: Alias
+      selector: 'rev5:meta/rev5:editable-url-segment'
+    -
+      name: post_date
+      label: 'Post Date'
+      selector: 'rev5:post-date'
+    -
+      name: meta_description
+      label: 'Meta Description'
+      selector: 'rev5:meta/rev5:description'
+    -
+      name: topics
+      label: 'Topics'
+      selector: 'rev5:list[@xid="topic.taxonomy"]/rev5:taxonomy/rev5:title'
+    -
+      name: type
+      label: 'Type'
+      selector: 'rev5:list[@xid="classification.taxonomy"]/rev5:taxonomy/rev5:title'
+  # Under 'ids', we identify source fields populated above which will uniquely
+  # identify each imported item. The 'type' makes sure the migration map table
+  # uses the proper schema type for stored the IDs.
+  ids:
+    id:
+      type: string
+  constants:
+    domain: 'www_gamma_com'
+  # The location of the csv taxonomy maps; the migration will fail if these are missing.
+  file_stream:
+    type: public://gamma/data/gamma-Taxonomy-TypeMapping.csv
+    topic: public://gamma/data/gamma-Taxonomy-TopicMapping.csv
+
+process:
+  type:
+    plugin: default_value
+    default_value: dynamic_page
+  title:
+    plugin: gamma_parse_title
+    source: title
+  body/value:
+    -
+      plugin: gamma_parse_body
+      source: body
+    -
+      plugin: gamma_entity_embed
+      source: body
+      remote_domain: 'www.gamma.com'
+  body/format:
+    plugin: default_value
+    default_value: "full_html"
+  field_domain_access: constants/domain
+  field_page_subtitle: subtitle
+  field_author:
+    plugin: gamma_people_reference
+    source: author
+  created:
+    plugin: callback
+    source: post_date
+    callable: strtotime
+  changed:
+    plugin: callback
+    callable: strtotime
+  uid:
+    plugin: default_value
+    default_value: 1
+  field_aggregated_content:
+    plugin: default_value
+    default_value: gamma_archive
+  field_metatag_description: prepare_meta_description
+  field_topic_reference:
+    source: prepare_topic_tids
+    plugin: sub_process
+    process:
+      target_id: target_id
+  field_type_reference:
+    source: prepare_type_tids
+    plugin: sub_process
+    process:
+      target_id: target_id
+  path/pathauto:
+    plugin: default_value
+    default_value: 0 # Disable pathauto.
+  _path_initiator:
+    plugin: default_value
+    default_value: /articles/
+  _path_prefix:
+    plugin: concat
+    source:
+      - '@_path_initiator'
+      - id
+  path/alias:
+    plugin: concat
+    source:
+      - '@_path_prefix'
+      - alias
+
+destination:
+  plugin: entity:node
+dependencies:
+  module:
+    - example_customD8_migrate

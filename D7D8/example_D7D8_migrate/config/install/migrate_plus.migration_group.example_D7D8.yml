@@ -1,0 +1,14 @@
+id: example_D7D8
+label: Example D7D8
+description: Migrates content from D7 to D8.
+source_type: Drupal 7 Site
+shared_configuration:
+ source:
+   key: example_D7D8
+dependencies:
+ enforced:
+   module:
+     - example_D7D8_migrate
+     - migrate_drupal
+     - migrate_plus
+     - migrate_tools

@@ -1,0 +1,34 @@
+id: users
+label: Users
+migration_tags:
+  - D7
+migration_group: example_D7D8
+source:
+  plugin: users
+destination:
+  plugin: entity:user
+process:
+  name: name
+  pass: pass
+  mail: mail
+  status: status
+  created: created
+  changed: changed
+  access: access
+  login: login
+  timezone: timezone
+  langcode: language
+  init: init
+  roles:
+    plugin: static_map
+    source: roles
+    map:
+      2: authenticated
+      3: editor
+      4: administrator
+migration_dependencies:
+  required: { }
+dependencies:
+ enforced:
+   module:
+     - example_D7D8_migrate

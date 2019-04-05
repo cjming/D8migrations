@@ -1,0 +1,90 @@
+id: beta_files_media
+migration_group: example_customD8_beta
+migration_tags:
+  - CustomD8 Beta
+label: 'Generate Beta File Media Entities'
+
+source:
+  plugin: csv
+  path: ./modules/custom/example_customD8_migrate_beta/data/example_customD8_migrate_beta.csv
+  header_row_count: 1
+  enclosure: '"'
+  keys:
+    - URL
+  column_names:
+    0:
+      Resource: 'Title'
+    2:
+      URL: Identifier
+    7:
+      Modified: 'Modified date'
+    8:
+      Published: 'Published date'
+    9:
+      Keep?: 'Import or not'
+  constants:
+    file_dest_uri: 'public://beta'
+    domain: 'www_beta_com'
+destination:
+  plugin: entity:media
+process:
+  filter:
+    plugin: import
+    source: Keep?
+  file:
+    plugin: skip_html
+    source: URL
+  bundle:
+    plugin: default_value
+    default_value: file
+  name: Resource
+  filename:
+    plugin: file_name
+    source: URL
+  file_destination:
+    plugin: concat
+    delimiter: /
+    source:
+      - constants/file_dest_uri
+      - '@filename'
+  field_media_file/target_id:
+    plugin: file_id
+    source: '@file_destination'
+  field_domain_access: constants/domain
+  created:
+    -
+      plugin: get
+      source:
+        - Published
+        - Modified
+    -
+      plugin: callback
+      callable: array_filter
+    -
+      plugin: callback
+      callable: 'current'
+    -
+      plugin: callback
+      callable: strtotime
+  changed:
+    -
+      plugin: get
+      source:
+        - Published
+        - Modified
+    -
+      plugin: callback
+      callable: array_filter
+    -
+      plugin: callback
+      callable: 'current'
+    -
+      plugin: callback
+      callable: strtotime
+  uid:
+    plugin: default_value
+    default_value: 1
+
+dependencies:
+  module:
+    - example_customD8_migrate

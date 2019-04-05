@@ -1,0 +1,117 @@
+id: beta_pages
+migration_group: example_customD8_beta
+migration_tags:
+  - CustomD8 Beta
+label: 'Import XML content from Beta files'
+
+source:
+  plugin: csv
+  path: ./modules/custom/example_customD8_migrate_beta/data/example_customD8_migrate_beta_content.csv
+  header_row_count: 1
+  keys:
+    - filepath
+  column_names:
+    0:
+      url: 'Absolute Path'
+    1:
+      filepath: 'Relative Path'
+    2:
+      dcrpath: 'Local XML Location'
+    3:
+      publish-date: 'Published Date'
+    4:
+      keep: 'Import or not'
+    5:
+      topic: 'Topic taxonomy'
+    6:
+      type: 'Type taxonomy'
+    7:
+      title: 'Title'
+    8:
+      description: 'Description'
+  ids:
+    filepath:
+      type: string
+  constants:
+    domain: 'www_beta_com'
+
+process:
+  filter1:
+    plugin: import
+    source: keep
+  filter2:
+    plugin: check_for_web
+    source: filepath
+  type:
+    plugin: default_value
+    default_value: dynamic_page
+  title:
+    plugin: parse_xml
+    source: dcrpath
+    module: example_customD8_migrate_beta
+  body/value:
+    -
+      plugin: parse_body
+      source: dcrpath
+      module: example_customD8_migrate_beta
+    -
+      plugin: entity_embed
+      remote_domain: 'http://www.beta.com'
+  body/format:
+    plugin: default_value
+    default_value: "full_html"
+  field_metatag_description:
+    plugin: parse_xml
+    source: dcrpath
+    module: example_customD8_migrate_beta
+  field_domain_access: constants/domain
+  current_timestamp:
+    plugin: callback
+    callable: strtotime
+  created:
+    -
+      plugin: callback
+      source: publish-date
+      callable: strtotime
+    -
+      plugin: default_value
+      source: '@current_timestamp'
+  changed:
+    -
+      plugin: callback
+      source: publish-date
+      callable: strtotime
+    -
+      plugin: default_value
+      source: '@current_timestamp'
+  field_topic_reference:
+    plugin: beta_topics
+    source: topic
+  field_type_reference:
+    plugin: beta_types
+    source: type
+  field_resource_repo:
+    plugin: default_value
+    default_value: 0
+  uid:
+    plugin: default_value
+    default_value: 1
+  sticky:
+    plugin: default_value
+    default_value: 0
+  path/pathauto:
+    plugin: default_value
+    # Disable pathauto.
+    default_value: 0
+  path/alias:
+    # Using filepath gives us same alias as current www.beta.com site.
+    plugin: remove_extension
+    source: filepath
+  status:
+    plugin: default_value
+    default_value: 0
+destination:
+  plugin: entity:node
+dependencies:
+  module:
+    - example_customD8_migrate

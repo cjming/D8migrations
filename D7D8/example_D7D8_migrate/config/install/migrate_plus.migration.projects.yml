@@ -1,0 +1,94 @@
+id: projects
+migration_group: example_D7D8
+migration_tags:
+  - D7
+label: 'Projects'
+source:
+  plugin: projects
+
+destination:
+  plugin: entity:node
+  bundle: project
+process:
+  nid: nid
+  type: type
+  langcode:
+    plugin: static_map
+    bypass: true
+    source: language
+    map:
+      und: en
+  title: title
+  uid:
+    -
+      plugin: migration_lookup
+      migration: users
+      no_stub: true
+      source: uid
+    -
+      plugin: default_value
+      default_value: 1
+  status: status
+  created: created
+  changed: changed
+  'body/format':
+    plugin: default_value
+    default_value: full_html
+  'body/value': body_value
+  'body/summary': field_teaser
+  field_image/target_id:
+    plugin: migration_lookup
+    migration: media
+    no_stub: true
+    source: field_image_fid
+  field_project_status: field_activity_status
+  field_website:
+    plugin: sub_process
+    source: field_url
+    process:
+      title: title
+      uri: uri
+  field_files:
+    plugin: sub_process
+    source: field_files
+    process:
+      target_id:
+          plugin: migration_lookup
+          migration: media
+          no_stub: true
+          source: fid
+  field_related_persons:
+    plugin: sub_process
+    source: field_members
+    process:
+      target_id:
+        plugin: migration_lookup
+        migration: persons
+        no_stub: true
+        source: nid
+  field_related_topics:
+    plugin: project_topics_map
+    source: title
+  field_related_projects:
+    plugin: sub_process
+    source: field_project
+    process:
+      target_id:
+        plugin: migration_lookup
+        migration: projects
+        source: nid
+  'path/alias': alias
+  'path/pathauto':
+    plugin: default_value
+    default_value: 0
+migration_dependencies:
+  required:
+    - users
+    - files
+    - media
+    - persons
+  optional: {  }
+
+dependencies:
+  module:
+    - example_D7D8_migrate

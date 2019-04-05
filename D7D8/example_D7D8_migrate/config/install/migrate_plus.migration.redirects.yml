@@ -1,0 +1,30 @@
+id: redirects
+label: 'Redirects'
+migration_group: example_D7D8
+migration_tags:
+  - D7
+source:
+  # This is the id of the source we will add. That will live
+  # in `/src/Plugin/migrate/source`.
+  plugin: redirects
+process:
+  rid: rid
+  uid: uid
+  redirect_source/path: source
+  redirect_source/query:
+   # `RedirectSourceQuery.php` is the process plugin to use.
+   plugin: d7_redirect_source_query
+   source: source_options
+  redirect_redirect/uri:
+    # `PathRedirect.php` is the process plugin to use.
+    plugin: d7_path_redirect
+    source:
+      - redirect
+      - redirect_options
+  language:
+    plugin: default_value
+    source: language
+    default_value: und
+  status_code: status_code
+destination:
+  plugin: entity:redirect

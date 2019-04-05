@@ -1,0 +1,27 @@
+id: wp_terms
+label: Terms
+migration_tags:
+  - Wordpress
+migration_group: wordpress
+source:
+  plugin: terms
+  key: wordpress
+process:
+  tid: term_id
+  vid:
+    plugin: default_value
+    default_value: category
+  name: name
+  description: description
+  weight:
+    plugin: default_value
+    default_value: 0
+  parent:
+    plugin: migration_lookup
+    migration: wp_terms
+    source: parent
+destination:
+  plugin: entity:taxonomy_term
+migration_dependencies:
+  required: {  }
+  optional: {  }

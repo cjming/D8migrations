@@ -1,0 +1,10 @@
+name: Example Custom D8 Migrate Gamma XML to D8
+type: module
+core: 8.x
+package: Example
+description: 'XML to Drupal 8 Custom Migration Module - Gamma'
+dependencies:
+  - drupal:migrate
+  - drupal:example_customD8_migrate
+  - migrate_plus:migrate_plus
+  - migrate_tools:migrate_tools

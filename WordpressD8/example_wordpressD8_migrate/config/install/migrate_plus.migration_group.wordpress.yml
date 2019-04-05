@@ -1,0 +1,4 @@
+id: wordpress
+label: WordPress
+description: Migrates content from WordPress to Drupal.
+source_type: database

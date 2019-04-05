@@ -1,0 +1,48 @@
+id: alpha_pages_redirects
+migration_group: example_customD8_alpha
+migration_tags:
+  - CustomD8 Alpha
+label: Alpha Path Redirects
+source:
+  plugin: csv
+  path: ./modules/custom/example_customD8_migrate_alpha/data/example_customD8_migrate_alpha.csv
+  header_row_count: 1
+  keys:
+    - filepath
+  column_names:
+    1:
+      filepath: 'Redirect path'
+    5:
+      keep?: 'Migrate Yes or No'
+  ids:
+    filepath:
+      type: string
+  constants:
+    domain: 'www_alpha_org'
+process:
+  filter1:
+    plugin: check_for_web
+    source: filepath
+  filter2:
+    plugin: alpha_check_migrate
+    source: keep?
+  uid:
+    plugin: default_value
+    default_value: 1
+  redirect_source/path:
+    plugin: strip_leading_slash
+    source: filepath
+  redirect_redirect/uri:
+    plugin: alpha_pages_redirects
+    source: filepath
+  language:
+    plugin: default_value
+    default_value: und
+  status_code:
+    plugin: default_value
+    default_value: 301
+destination:
+  plugin: entity:redirect
+  dependencies:
+    module:
+      - example_customD8_migrate

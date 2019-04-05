@@ -1,0 +1,89 @@
+# This migration demonstrates importing from multiple XML files.
+id: gamma_authors
+label: 'Import authors from Gamma XML files'
+migration_group: example_customD8_gamma
+migration_tags:
+  - Example CustomD8 Gamma
+
+source:
+  # We use the XML source plugin.
+  plugin: url
+  data_fetcher_plugin: file
+  data_parser_plugin: xml
+  # Normally, this is one or more fully-qualified URLs or file paths. Because
+  # we can't hardcode your local URL, we provide a relative path here which
+  # hook_install() will rewrite to a full URL for the current site.
+  urls:
+    - public://gamma/data/export_1.xml
+    - public://gamma/data/export_2.xml
+    - public://gamma/data/export_3.xml
+  # Visit the URL above (relative to your site root) and look at it. You can see
+  # that <response> is the outer element, and each item we want to import is a
+  # <position> element. The item_xpath value is the xpath to use to query the
+  # desired elements.
+  item_selector: /rev5:document/rev5:article/rev5:author
+  # Under 'fields', we list the data items to be imported. The first level keys
+  # are the source field names we want to populate (the names to be used as
+  # sources in the process configuration below). For each field we're importing,
+  # we provide a label (optional - this is for display in migration tools) and
+  # an xpath for retrieving that value. It's important to note that this xpath
+  # is relative to the elements retrieved by item_xpath.
+  fields:
+    -
+      name: author_id
+      label: 'Author ID'
+      selector: 'rev5:db-id'
+    -
+      name: author_firstname
+      label: 'Author First Name'
+      selector: 'rev5:first-name'
+    -
+      name: author_lastname
+      label: 'Author Last Name'
+      selector: 'rev5:last-name'
+
+  # Under 'ids', we identify source fields populated above which will uniquely
+  # identify each imported item. The 'type' makes sure the migration map table
+  # uses the proper schema type for stored the IDs.
+  ids:
+    # Was originally author ID, but this is an array and causes
+    # to break, using article ID instead.
+    author_id:
+      type: string
+  constants:
+    domain: 'www_gamma_com'
+
+process:
+  full_name:
+    -
+      plugin: concat
+      delimiter: ' '
+      source:
+        - author_firstname
+        - author_lastname
+    -
+      plugin: callback
+      callable: trim
+  field_first_name: author_firstname
+  field_last_name: author_lastname
+  filter_existing_author:
+    plugin: gamma_author_nid
+    source: '@full_name'
+    skip_on_match: 1
+  type:
+    plugin: default_value
+    default_value: people
+  field_domain_access: constants/domain
+  title: '@full_name'
+  created:
+    plugin: callback
+    callable: strtotime
+  changed:
+    plugin: callback
+    callable: strtotime
+
+destination:
+  plugin: entity:node
+dependencies:
+  module:
+    - example_customD8_migrate

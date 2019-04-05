@@ -1,0 +1,58 @@
+id: wp_users
+label: Users
+migration_tags:
+  - Wordpress
+migration_group: wordpress
+source:
+  plugin: users
+  key: wordpress
+  constants:
+    space: ' '
+destination:
+  plugin: entity:user
+process:
+  field_user_photo:
+    -
+      plugin: skip_on_empty
+      method: process
+      source: user_photo_url
+    -
+      plugin: file_exists
+      source: user_photo_url
+    -
+      plugin: file_import
+      source: user_photo_url
+  password: user_pass
+  field_user_display_name:
+    plugin: concat
+    source:
+      - first_name
+      - constants/space
+      - last_name
+  name:
+    -
+      plugin: get
+      source: user_login
+    -
+      plugin: dedupe_entity
+      entity_type: user
+      field: name
+  mail: user_email
+  roles: role
+  field_social_twitter: twitter
+  field_social_facebook: facebook
+  field_profile_bio: description
+  status:
+    plugin: default_value
+    default_value: 1
+  created:
+    plugin: callback
+    callable: strtotime
+    source: user_registered
+  access:
+    plugin: callback
+    callable: strtotime
+    source: last_active
+migration_dependencies:
+  required: {  }
+  optional: {  }

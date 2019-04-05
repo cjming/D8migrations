@@ -1,0 +1,104 @@
+id: beta_files_pages
+migration_group: example_customD8_beta
+migration_tags:
+  - CustomD8 Beta
+label: 'Create landing pages for Beta standalone text files'
+
+source:
+  plugin: csv
+  path: ./modules/custom/example_customD8_migrate_beta/data/example_customD8_migrate_beta.csv
+  header_row_count: 1
+  enclosure: '"'
+  keys:
+    - URL
+  column_names:
+    0:
+      Resource: 'Title'
+    2:
+      URL: Identifier
+    4:
+      Topic: 'Topic taxonomy'
+    5:
+      Type: 'Type taxonomy'
+    7:
+      Modified: 'Modified date'
+    8:
+      Published: 'Published date'
+    9:
+      Keep?: 'Import or not'
+  constants:
+    file_source_uri: 'http://www.beta.com'
+    file_dest_uri: 'public://beta'
+    domain: 'www_beta_com'
+
+process:
+  filter1:
+    plugin: import
+    source: Keep?
+  filter2:
+    plugin: skip_html
+    source: URL
+  type:
+    plugin: default_value
+    default_value: dynamic_page
+  title: Resource
+  filename:
+    plugin: file_name
+    source: URL
+  field_related_files:
+    plugin: entity_lookup
+    source: Resource
+  field_topic_reference:
+    plugin: beta_topics
+    source: Topic
+  field_type_reference:
+    plugin: beta_types
+    source: Type
+  field_domain_access: constants/domain
+  created:
+    -
+      plugin: get
+      source:
+        - Published
+        - Modified
+    -
+      plugin: callback
+      callable: array_filter
+    -
+      plugin: callback
+      callable: 'current'
+    -
+      plugin: callback
+      callable: strtotime
+  changed:
+    -
+      plugin: get
+      source:
+        - Published
+        - Modified
+    -
+      plugin: callback
+      callable: array_filter
+    -
+      plugin: callback
+      callable: 'current'
+    -
+      plugin: callback
+      callable: strtotime
+  field_resource_repo:
+    plugin: default_value
+    default_value: 1
+  uid:
+    plugin: default_value
+    default_value: 1
+  sticky:
+    plugin: default_value
+    default_value: 0
+  status:
+    plugin: default_value
+    default_value: 0
+destination:
+  plugin: entity:node
+dependencies:
+  module:
+    - example_customD8_migrate

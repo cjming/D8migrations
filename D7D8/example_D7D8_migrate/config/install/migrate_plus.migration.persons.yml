@@ -1,0 +1,66 @@
+id: persons
+label: Persons
+migration_tags:
+  - D7
+migration_group: example_D7D8
+source:
+  plugin: persons
+destination:
+  plugin: entity:node
+  bundle: person
+process:
+  nid: nid
+  type: type
+  langcode:
+    plugin: static_map
+    bypass: true
+    source: language
+    map:
+      und: en
+  title: title
+  uid:
+    -
+      plugin: migration_lookup
+      migration: users
+      no_stub: true
+      source: uid
+    -
+      plugin: default_value
+      default_value: 1
+  status: status
+  created: created
+  changed: changed
+  'body/format':
+    plugin: default_value
+    default_value: full_html
+  'body/value': body_value
+  'body/summary': field_short_bio
+  field_last_name: field_last_name
+  field_job: field_job_title
+  field_email: field_email
+  field_role: field_role
+  field_website:
+    plugin: sub_process
+    source: field_links
+    process:
+      title: title
+      uri: uri
+  field_image/target_id:
+    plugin: migration_lookup
+    migration: media
+    no_stub: true
+    source: field_thumbnail_fid
+  'path/alias': alias
+  'path/pathauto':
+    plugin: default_value
+    default_value: 0
+migration_dependencies:
+  required:
+    - users
+    - files
+    - media
+  optional: {  }
+
+dependencies:
+  module:
+    - example_D7D8_migrate

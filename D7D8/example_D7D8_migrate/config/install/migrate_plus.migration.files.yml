@@ -1,0 +1,49 @@
+id: files
+migration_group: example_D7D8
+migration_tags:
+  - D7
+label: 'Files'
+source:
+  plugin: files
+
+destination:
+  plugin: 'entity:file'
+  source_base_path: https://www.D7D8.edu/
+  source_path_property: uri
+  urlencode: true
+  destination_path_property: uri
+
+process:
+  fid: fid
+  filename: filename
+  uri:
+    -
+      plugin: skip_on_empty
+      method: row
+      source: uri
+    -
+      plugin: file_exists
+      source: filepath
+    -
+      plugin: download
+      source:
+        - filepath
+        - destination_uri
+      connect_timeout: 3
+  uid:
+    -
+      plugin: migration
+      migration: users
+      source: uid
+      no_stub: true
+    -
+      plugin: default_value
+      default_value: 1
+
+migration_dependencies:
+  require:
+    - users
+
+dependencies:
+  module:
+    - example_D7D8_migrate

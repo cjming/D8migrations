@@ -1,0 +1,30 @@
+id: wp_editor_redirects
+label: Editor Redirects
+migration_tags:
+  - Wordpress
+migration_group: wordpress
+source:
+  plugin: editor_redirects
+  key: wordpress
+process:
+  uid:
+    plugin: default_value
+    default_value: 1
+  redirect_source/path:
+    plugin: redirect_path
+    source: url
+  redirect_redirect/uri:
+    plugin: redirect_internal
+    source: action_data
+  language:
+    plugin: default_value
+    default_value: und
+  status_code:
+    plugin: default_value
+    default_value: 301
+destination:
+  plugin: entity:redirect
+  optional: {  }
+migration_dependencies:
+  required: {  }
+  optional: {  }

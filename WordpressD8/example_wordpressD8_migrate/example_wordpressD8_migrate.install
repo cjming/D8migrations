@@ -1,0 +1,11 @@
+<?php
+
+/**
+ * Implements hook_uninstall().
+ *
+ * Cleans up config entities installed by this module.
+ */
+function migrate_wordpress_uninstall() {
+  db_query("DELETE FROM {config} WHERE name LIKE 'migrate_plus.migration.wp_%'");
+  \Drupal::cache()->deleteAll();
+}

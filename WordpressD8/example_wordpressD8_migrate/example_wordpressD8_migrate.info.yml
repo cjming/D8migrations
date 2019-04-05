@@ -1,0 +1,9 @@
+name: Example WordpressD8 Migrate
+type: module
+description: 'Migrates content from the existing WordPress site.'
+package: Dish
+core: 8.x
+dependencies:
+  - migrate
+  - migrate_plus
+  - migrate_tools

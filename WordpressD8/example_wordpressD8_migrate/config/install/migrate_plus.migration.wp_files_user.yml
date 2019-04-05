@@ -1,0 +1,30 @@
+id: wp_files_user
+label: Files - User Generated
+migration_tags:
+  - Wordpress
+migration_group: wordpress
+source:
+  plugin: user_images
+  key: wordpress
+destination:
+  plugin: entity:file
+process:
+  name: title
+  filename: filename
+  uri:
+    -
+      plugin: skip_on_empty
+      method: row
+      source: url
+    -
+      plugin: download
+      source:
+        - url
+        - destination_uri
+      connect_timeout: 2
+  uid:
+    plugin: default_value
+    default_value: 1
+migration_dependencies:
+  required: {  }
+  optional: {  }

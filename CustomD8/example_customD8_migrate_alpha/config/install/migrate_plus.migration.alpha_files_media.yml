@@ -1,0 +1,81 @@
+id: alpha_files_media
+migration_group: example_customD8_alpha
+migration_tags:
+  - Example CustomD8 Alpha
+label: 'Generate Alpha File Media Entities'
+
+source:
+  plugin: csv
+  path: ./modules/custom/example_customD8_migrate_alpha/data/example_customD8_migrate_alpha.csv
+  header_row_count: 1
+  enclosure: '"'
+  keys:
+    - filepath
+  column_names:
+    0:
+      url: 'URL Path'
+    1:
+      filepath: 'File Path'
+    2:
+      dcrpath: 'Local Path to XML'
+    3:
+      last-modified: 'Modified Date'
+    5:
+      keep?: 'Migrate Yes or No'
+    6:
+      title: 'Title'
+    7:
+      description: 'Description'
+  constants:
+    file_dest_uri: 'public://alpha'
+
+destination:
+  plugin: entity:media
+process:
+  filter1:
+    plugin: check_for_docs
+    source: filepath
+  filter2:
+    plugin: alpha_check_migrate
+    source: keep?
+  bundle:
+    plugin: default_value
+    default_value: file
+  filename:
+    plugin: file_name
+    source: filepath
+  name:
+    plugin: get
+    source:
+      - title
+      - '@filename'
+  destination_folder:
+    plugin: alpha_destination
+    source: filepath
+  file_destination:
+    plugin: concat
+    delimiter: /
+    source:
+      - '@destination_folder'
+      - '@filename'
+  field_media_file/target_id:
+    plugin: file_id
+    source: '@file_destination'
+  created:
+    plugin: callback
+    source: last-modified
+    callable: strtotime
+  changed:
+    plugin: callback
+    callable: strtotime
+  uid:
+    plugin: default_value
+    default_value: 1
+  field_protected:
+    plugin: alpha_protected
+    source: filepath
+    default_value: 0
+
+dependencies:
+  module:
+    - example_customD8_migrate

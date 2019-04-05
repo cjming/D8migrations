@@ -1,0 +1,13 @@
+id: example_customD8_alpha
+label: Example CustomD8 Alpha
+description: Migrates the files from Alpha Legacy Application to D8.
+source_type: XML Files
+shared_configuration:
+ source:
+   key: example_customD8_alpha
+dependencies:
+ enforced:
+   module:
+    - example_customD8_migrate
+    - migrate_plus
+    - migrate_tools

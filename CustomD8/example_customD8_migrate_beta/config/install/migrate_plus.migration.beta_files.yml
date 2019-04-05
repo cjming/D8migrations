@@ -1,0 +1,98 @@
+id: beta_files
+migration_group: example_customD8_beta
+migration_tags:
+  - CustomD8 Beta
+label: 'Import Beta Files'
+
+source:
+  plugin: csv
+  path: ./modules/custom/example_customD8_migrate_beta/data/example_customD8_migrate_beta.csv
+  header_row_count: 1
+  enclosure: '"'
+  keys:
+    - URL
+  column_names:
+    0:
+      Resource: 'Title'
+    2:
+      URL: Identifier
+    7:
+      Modified: 'Modified date'
+    8:
+      Published: 'Published date'
+    9:
+      Keep?: 'Import or not'
+  constants:
+    file_source_uri: 'http://www.beta.com'
+    file_dest_uri: 'public://beta'
+
+process:
+  filter:
+    plugin: import
+    source: Keep?
+  file:
+    plugin: skip_html
+    source: URL
+  relativeurl:
+    plugin: remove_base_url
+    source: URL
+    baseurl: 'http://www.beta.com'
+  filepath:
+    plugin: check_base_url
+    source: '@relativeurl'
+    baseurl: 'http://www.beta.com'
+  fid:
+    plugin: file_import
+    source: '@filepath'
+    folder: 'public://beta'
+  filename:
+    plugin: file_name
+    source: URL
+  uri:
+    plugin: concat
+    delimiter: /
+    source:
+      - constants/file_dest_uri
+      - '@filename'
+  created:
+    -
+      plugin: get
+      source:
+        - Published
+        - Modified
+    -
+      plugin: callback
+      callable: array_filter
+    -
+      plugin: callback
+      callable: 'current'
+    -
+      plugin: callback
+      callable: strtotime
+  changed:
+    -
+      plugin: get
+      source:
+        - Published
+        - Modified
+    -
+      plugin: callback
+      callable: array_filter
+    -
+      plugin: callback
+      callable: 'current'
+    -
+      plugin: callback
+      callable: strtotime
+  uid:
+    plugin: default_value
+    default_value: 1
+  status:
+    plugin: default_value
+    default_value: 1
+
+destination:
+  plugin: 'entity:file'
+dependencies:
+  module:
+    - example_customD8_migrate

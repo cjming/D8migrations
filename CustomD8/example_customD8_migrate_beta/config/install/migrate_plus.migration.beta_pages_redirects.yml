@@ -1,0 +1,49 @@
+id: beta_pages_redirects
+migration_group: example_customD8_beta
+migration_tags:
+  - CustomD8 Beta
+label: Beta Path Redirects
+source:
+  plugin: csv
+  path: ./modules/custom/example_customD8_migrate_beta/data/example_customD8_migrate_beta_content.csv
+  header_row_count: 1
+  keys:
+    - filepath
+  column_names:
+    1:
+      filepath: 'Redirect path'
+    4:
+      keep: 'Import or not'
+  ids:
+    filepath:
+      type: string
+  constants:
+    subsite: 'Beta'
+    domain: 'www_beta_com'
+process:
+  filter1:
+    plugin: import
+    source: keep
+  filter2:
+    plugin: check_for_web
+    source: filepath
+  uid:
+    plugin: default_value
+    default_value: 1
+  redirect_source/path:
+    plugin: strip_leading_slash
+    source: filepath
+  redirect_redirect/uri:
+    plugin: beta_pages_redirects
+    source: filepath
+  language:
+    plugin: default_value
+    default_value: und
+  status_code:
+    plugin: default_value
+    default_value: 301
+destination:
+  plugin: entity:redirect
+  dependencies:
+    module:
+      - example_customD8_migrate

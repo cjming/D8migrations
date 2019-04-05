@@ -1,0 +1,121 @@
+id: articles
+migration_group: example_D7D8
+migration_tags:
+  - D7
+label: 'Articles'
+source:
+  plugin: articles
+destination:
+  plugin: entity:node
+  bundle: article
+process:
+  nid: nid
+  vid: vid
+  type: type
+  langcode:
+    plugin: default_value
+    default_value: en
+  title: title
+  uid:
+    -
+      plugin: migration_lookup
+      migration: users
+      no_stub: true
+      source: uid
+    -
+      plugin: default_value
+      default_value: 1
+  status: status
+  created: created
+  changed: changed
+  'body/format':
+    plugin: default_value
+    default_value: full_html
+  'body/value': body_value
+  'body/summary': field_teaser
+  field_subtitle: field_subtitle
+  field_image/target_id:
+    plugin: migration_lookup
+    migration: media
+    no_stub: true
+    source: field_image_fid
+  field_related_persons:
+    plugin: sub_process
+    source: field_persons
+    process:
+      target_id:
+        plugin: migration_lookup
+        migration: persons
+        no_stub: true
+        source: nid
+  field_related_projects:
+    plugin: sub_process
+    source: field_projects
+    process:
+      target_id:
+        plugin: migration_lookup
+        migration: projects
+        no_stub: true
+        source: nid
+  field_related_topics:
+    plugin: sub_process
+    source: field_topics
+    process:
+      target_id: tid
+  field_related_publications:
+    plugin: sub_process
+    source: field_publications
+    process:
+      target_id:
+        plugin: migration_lookup
+        migration: publications
+        no_stub: true
+        source: nid
+  field_related_courses:
+    plugin: sub_process
+    source: field_courses
+    process:
+      target_id:
+        plugin: migration_lookup
+        migration: courses
+        no_stub: true
+        source: nid
+  field_related_audio:
+    plugin: sub_process
+    source: field_related_audio
+    process:
+      title: title
+      uri: uri
+  field_related_video:
+    plugin: sub_process
+    source: field_related_video
+    process:
+      title: title
+      uri: uri
+  field_files:
+    plugin: sub_process
+    source: field_files
+    process:
+      target_id:
+          plugin: migration_lookup
+          migration: media
+          no_stub: true
+          source: fid
+  'path/alias': alias
+  'path/pathauto':
+    plugin: default_value
+    default_value: 0
+migration_dependencies:
+  required:
+    - users
+    - files
+    - media
+    - persons
+    - projects
+    - publications
+    - courses
+  optional: {  }
+
+dependencies:
+  module:
+    - example_D7D8_migrate

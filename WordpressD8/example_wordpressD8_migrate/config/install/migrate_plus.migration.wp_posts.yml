@@ -1,0 +1,84 @@
+id: wp_posts
+label: Posts
+migration_tags:
+  - Wordpress
+migration_group: wordpress
+source:
+  plugin: posts
+  key: wordpress
+  constants:
+    slash: '/'
+destination:
+  plugin: entity:node
+  bundle: post
+process:
+  type:
+    plugin: default_value
+    default_value: post
+  created:
+    plugin: callback
+    callable: strtotime
+    source: post_date
+  changed:
+    plugin: callback
+    callable: strtotime
+    source: post_modified
+  langcode:
+    plugin: default_value
+    default_value: und
+  title: post_title
+  field_author: author
+  uid:
+    -
+      plugin: migration_lookup
+      migration: wp_users
+      source: post_author
+    -
+      plugin: default_value
+      default_value: 1
+  status:
+    plugin: default_value
+    default_value: 1
+  field_category:
+    -
+      plugin: term_map
+      source: tags
+    -
+      plugin: migration_lookup
+      migration: wp_terms
+  'body/format':
+    plugin: default_value
+    default_value: filtered_html
+  'body/value':
+    -
+      plugin: format_text
+      source: post_content
+    -
+      plugin: entity_embed
+  'path/pathauto':
+    plugin: default_value
+    default_value: 0
+  'path/alias':
+    plugin: concat
+    source:
+      - constants/slash
+      - post_name
+  field_social_share_image/target_id:
+    -
+      plugin: skip_on_empty
+      method: process
+      source: post_attachment
+    -
+      plugin: migration_lookup
+      migration:
+        - wp_media
+  field_metatags:
+    plugin: set_metatags
+    source: post_metatags
+migration_dependencies:
+  required:
+    - wp_terms
+    - wp_users
+    - wp_files
+    - wp_media
+  optional: {  }
