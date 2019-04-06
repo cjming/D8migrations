@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\example_D7D7_migrate\Plugin\migrate\source;
+namespace Drupal\example_D7D8_migrate\Plugin\migrate\source;
 
 use Drupal\migrate\Row;
 use Drupal\migrate\Plugin\migrate\source\SqlBase;
@@ -12,7 +12,7 @@ use Drupal\Component\Utility\Unicode;
  * Extract articles from Drupal 7 database.
  *
  * @MigrateSource(
- *   id = "stories"
+ *   id = "articles"
  * )
  */
 class Articles extends SqlBase {
