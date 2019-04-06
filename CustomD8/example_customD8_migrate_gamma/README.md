@@ -2,7 +2,7 @@
 
 ## Setting up files for migrations
 
-The tar file of the source XML is available here: https://google.com
+The tar file of the source XML is available here: ________________
 
 The tar file of source XML must be rsynced to a specific folder in the files system:
 ```

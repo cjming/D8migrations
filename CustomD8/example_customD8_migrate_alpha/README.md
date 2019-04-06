@@ -13,7 +13,7 @@ tar -xvzf ../web/modules/custom/example_customD8_migrate_alpha/data/xml/alpha_xm
 
 The Alpha migrations involve ingesting protected files. The tar files for the protected Alpha content are too big to commit to the repo so they must be rsynced to test servers and prod, then untarred before running migrations.
 
-The latest version of the Alpha protected files dumps are available at https://google.com
+The latest version of the Alpha protected files dumps are available at ________________
 
 The tar files must be rsynced to a specific folder in the files system:
 ```
