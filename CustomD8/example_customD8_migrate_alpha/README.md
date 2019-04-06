@@ -6,7 +6,7 @@ To see the current status of migrations:
 ```
 drush ms
 ```
-The DCR tar file must be untarred before running migrations:
+The Alpha tar file must be untarred before running migrations:
 ```
 tar -xvzf ../web/modules/custom/example_customD8_migrate_alpha/data/xml/alpha_xml.tar.gz
 ```
