@@ -1,0 +1,5 @@
+name: Example Migrate Shared functionality for migrations to D8
+type: module
+core: 8.x
+package: Example
+description: 'Shared functionality for migrations to Drupal 8.'
