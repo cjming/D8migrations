@@ -17,8 +17,8 @@ The CSV mapping for taxonomy topic and type terms should be placed in the gamma 
 
 Download the following mappings:
 
-Topics - https://google.com
-Types - https://google.com
+Topics - ___________________ 
+Types - ____________________
 
 Then place the files here:
 ```
