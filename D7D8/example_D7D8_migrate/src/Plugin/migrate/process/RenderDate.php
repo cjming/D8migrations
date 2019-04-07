@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\example_D7D8migrate\Plugin\migrate\process;
+namespace Drupal\example_D7D8_migrate\Plugin\migrate\process;
 
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutableInterface;

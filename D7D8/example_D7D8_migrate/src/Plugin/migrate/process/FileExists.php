@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\bkc_migrate\Plugin\migrate\process;
+namespace Drupal\example_D7D8_migrate\Plugin\migrate\process;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\MigrateExecutableInterface;
